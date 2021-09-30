@@ -19,11 +19,9 @@
 */
 
 import Route from "@ioc:Adonis/Core/Route";
+import "./routes/brand";
+import "./routes/vehicle";
 
 Route.get("/", async () => {
   return [{ hello: "world" }];
 });
-
-Route.resource("/brands", "BrandsController").apiOnly();
-
-Route.resource("/vehicles", "VehiclesController").apiOnly();

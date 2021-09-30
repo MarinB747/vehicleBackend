@@ -17,15 +17,16 @@ export default class VehiclesController {
     return Vehicle.findOrFail(params.id);
   }
   public async update({ params, request }: HttpContextContract) {
+    //ako postoji name taj i taj u bazi.. kjazes mu da vec postoji auto/brand s tim imenom u bazi
     const body = request.body();
 
     const vehicle = await Vehicle.findOrFail(params.id);
 
-    vehicle.parent_id = body.parent_id;
+    vehicle.brand_id = body.brand_id;
     vehicle.model = body.model;
     vehicle.year = body.year;
 
-    return vehicle.save();
+    return await vehicle.save();
   }
   public async destroy({ params, response }: HttpContextContract) {
     const vehicle = await Vehicle.findOrFail(params.id);
