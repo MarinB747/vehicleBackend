@@ -1,33 +1,40 @@
 import { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Brand from "App/Models/Brand";
+import { schema } from "@ioc:Adonis/Core/Validator";
+
 export default class BrandsController {
   //todo: ovdje dodaj paginaciju, filtere, search po imenu necemu
-  public async index(ctx: HttpContextContract) {
-    return Brand.all();
+  public async index({ request }: HttpContextContract) {
+    const { page = 1, ...input } = request.qs();
+    return Brand.filter(input).paginate(page, 10);
   }
   //todo: ovdje stavi validaciju podataka,. pogledaj kakop se koristi validator
   public async store({ request, response }: HttpContextContract) {
-    const body = request.body();
-
-    const payload = await Brand.create(body);
-
-    //todo: ovdje pogledaj malo o statusima
-    // response.status(201);
-
-    // return brand;
-
-    response.accepted(payload);
+    const brandSchema = schema.create({
+      name: schema.string({ trim: true }),
+    });
+    const payload = await request.validate({ schema: brandSchema });
+    const brand = await Brand.create(payload);
+    response.status(201);
+    return brand;
   }
   public async show({ params, response }: HttpContextContract) {
-    response.ok(Brand.findOrFail(params.id));
+    if (params.id) return Brand.findOrFail(params.id);
+    else if (params.slug) return Brand.findOrFail(params.slug);
+    else return response.status(404);
   }
+
   //todo: uibacit validaciju
   public async update({ params, request }: HttpContextContract) {
-    const body = request.body();
+    const brandSchema = schema.create({
+      name: schema.string({ trim: true }),
+    });
+
+    const body = await request.validate({ schema: brandSchema });
 
     const brand = await Brand.findOrFail(params.id);
 
-    brand.name = body.name;
+    brand.merge(body);
 
     return await brand.save();
   }

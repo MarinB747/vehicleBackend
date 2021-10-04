@@ -2,8 +2,12 @@ import { DateTime } from "luxon";
 import { BaseModel, BelongsTo, belongsTo, column } from "@ioc:Adonis/Lucid/Orm";
 import Brand from "./Brand";
 import { slugify } from "@ioc:Adonis/Addons/LucidSlugify";
+import { compose } from "@ioc:Adonis/Core/Helpers";
+import { Filterable } from "@ioc:Adonis/Addons/LucidFilter";
+import VehicleFilter from "./Filters/VehicleFilter";
 
-export default class Vehicle extends BaseModel {
+export default class Vehicle extends compose(BaseModel, Filterable) {
+  public static $filter = () => VehicleFilter;
   @column({ isPrimary: true })
   public id: number;
 
